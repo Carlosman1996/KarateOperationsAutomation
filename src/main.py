@@ -82,13 +82,18 @@ class KarateOperationsAutomation:
                 karate_block_object = copy.deepcopy(karate_block_object_template)
                 for instruction in karate_block_object:
                     instruction["block"] = block_index
-                    instruction["comment"].replace("<key_description>", self.snake_to_pascal_case_converter(key))
-                    instruction["operation"].replace("<key_validation>", self.snake_to_pascal_case_converter(key))
-                    instruction["operation"].replace("<key>", self.snake_to_pascal_case_converter(key))
+                    instruction["comment"] = \
+                        instruction["comment"].replace("<key_description>", self.snake_to_pascal_case_converter(key))
+                    instruction["operation"] = \
+                        instruction["operation"].replace("<key_validation>", self.snake_to_pascal_case_converter(key))
+                    instruction["operation"] = \
+                        instruction["operation"].replace("<key>", self.snake_to_pascal_case_converter(key))
                     print(instruction["operation"])
 
                 # Set operations block:
                 karate_operations["scenario"]["steps"] += karate_block_object
+
+                block_index += 1
 
         JSONFileOperations.pretty_print_dict(karate_operations)
 
