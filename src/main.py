@@ -1,3 +1,5 @@
+import copy
+
 from utils import ROOT_PATH
 from utils import JSONFileOperations
 
@@ -15,7 +17,13 @@ class KarateOperationsAutomation:
         self.logger_level = logger_level
         self.input_path = input_path
         self.outputs_path = outputs_path
-        self.karate_template = ROOT_PATH + "//assets//karate_template.feature"
+        self.karate_template = ROOT_PATH + "//assets//karate_template.json"
+        self.karate_block_list_template = ROOT_PATH + "//assets//karate_block_list.json"
+        self.karate_block_object_template = ROOT_PATH + "//assets//karate_block_object.json"
+
+    @staticmethod
+    def snake_to_pascal_case_converter(string):
+        return string.replace('_', ' ').title().replace(' ', '')
 
     def simplify_response(self, response):
         # Initialize simplified response:
@@ -49,8 +57,13 @@ class KarateOperationsAutomation:
         return simplified_response
 
     def operations_constructor(self, response):
-        # Read Karate template:
-        karate_template = JSONFileOperations.read_file(self.karate_template)
+        # Variables:
+        block_index = 4
+
+        # Read Karate templates:
+        karate_operations = JSONFileOperations.read_file(self.karate_template)
+        karate_block_list_template = JSONFileOperations.read_file(self.karate_block_list_template)
+        karate_block_object_template = JSONFileOperations.read_file(self.karate_block_object_template)
 
         # Array operations constructor:
 
@@ -58,13 +71,26 @@ class KarateOperationsAutomation:
         # def object_constructor(object_dict):
 
         # Create operations:
-        # for key, value_type in response.items():
-        #     if type(value_type) == list:
-        #         # Array
-        #         simplified_response[key] = self.simplify_response(value_type)
-        #     elif type(value_type) == dict:
-        #         # Object (dictionary)
-        #         simplified_response[key] = self.simplify_response(value_type)
+        for key, value_type in response.items():
+            # if type(value_type) == list:
+            #     # Array
+            #     simplified_response[key] = self.simplify_response(value_type)
+            if type(value_type) == dict:
+                # Object (dictionary)
+
+                # Adapt operations block:
+                karate_block_object = copy.deepcopy(karate_block_object_template)
+                for instruction in karate_block_object:
+                    instruction["block"] = block_index
+                    instruction["comment"].replace("<key_description>", self.snake_to_pascal_case_converter(key))
+                    instruction["operation"].replace("<key_validation>", self.snake_to_pascal_case_converter(key))
+                    instruction["operation"].replace("<key>", self.snake_to_pascal_case_converter(key))
+                    print(instruction["operation"])
+
+                # Set operations block:
+                karate_operations["scenario"]["steps"] += karate_block_object
+
+        JSONFileOperations.pretty_print_dict(karate_operations)
 
     def run(self):
         # Initialize main variables:
@@ -74,9 +100,10 @@ class KarateOperationsAutomation:
 
         # Extract keys of types object or array:
         simplified_response = self.simplify_response(response=endpoint_response)
+        print(simplified_response)
 
         # Karate operations:
-        print(simplified_response)
+        self.operations_constructor(simplified_response)
 
 
 if __name__ == "__main__":

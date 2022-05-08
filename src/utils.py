@@ -107,6 +107,11 @@ class JSONFileOperations:
         else:
             return False
 
+    @staticmethod
+    def pretty_print_dict(dictionary):
+        parsed = json.loads(json.dumps(dictionary))
+        print(json.dumps(parsed, indent=4, sort_keys=True))
+
 
 class YAMLFileOperations:
     @staticmethod

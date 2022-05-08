@@ -1,75 +1,75 @@
 {
-  "Feature": {
-    "comment": ""
-  },
-  "Background": {
-    "comment": "",
-    "steps": [
-      {
-        "block": 0,
+    "feature": {
+        "comment": ""
+    },
+    "background": {
         "comment": "",
-        "operation": "* url urls.wscUrl"
-      }
-    ]
-  },
-  "Scenario": {
-    "comment": "",
-    "steps": [
-      {
-        "block": 0,
-        "comment": "Pretest operations:",
-        "operation": "* def req = __arg"
-      },
-      {
-        "block": 0,
+        "steps": [
+            {
+                "block": 0,
+                "comment": "",
+                "operation": "* url urls.wscUrl"
+            }
+        ]
+    },
+    "scenario": {
         "comment": "",
-        "operation": "* def authHeader = call read('classpath:karate-auth.js') req.auth"
-      },
-      {
-        "block": 0,
-        "comment": "",
-        "operation": "* def headers = karate.merge(req.headers || {}, authHeader || {})"
-      },
-      {
-        "block": 1,
-        "comment": "HTTP call:",
-        "operation": "Given path"
-      },
-      {
-        "block": 1,
-        "comment": "",
-        "operation": "And params params"
-      },
-      {
-        "block": 1,
-        "comment": "",
-        "operation": "And headers headers"
-      },
-      {
-        "block": 1,
-        "comment": "",
-        "operation": "When method GET"
-      },
-      {
-        "block": 2,
-        "comment": "Validate status code",
-        "operation": "* def expectedStatusCode = req.statusCode || responseStatus"
-      },
-      {
-        "block": 2,
-        "comment": "",
-        "operation": "* match responseStatus == expectedStatusCode"
-      },
-      {
-        "block": 3,
-        "comment": "Validate general schema:",
-        "operation": "* def responseValidator = req.responseMatches? req.responseMatches : {}"
-      },
-      {
-        "block": 3,
-        "comment": "",
-        "operation": "* match response contains responseValidator"
-      }
-    ]
-  }
+        "steps": [
+            {
+                "block": 0,
+                "comment": "Pretest operations",
+                "operation": "* def req = __arg"
+            },
+            {
+                "block": 0,
+                "comment": "",
+                "operation": "* def authHeader = call read('classpath:karate-auth.js') req.auth"
+            },
+            {
+                "block": 0,
+                "comment": "",
+                "operation": "* def headers = karate.merge(req.headers || {}, authHeader || {})"
+            },
+            {
+                "block": 1,
+                "comment": "HTTP call",
+                "operation": "Given path"
+            },
+            {
+                "block": 1,
+                "comment": "",
+                "operation": "And params params"
+            },
+            {
+                "block": 1,
+                "comment": "",
+                "operation": "And headers headers"
+            },
+            {
+                "block": 1,
+                "comment": "",
+                "operation": "When method GET"
+            },
+            {
+                "block": 2,
+                "comment": "Validate status code",
+                "operation": "* def expectedStatusCode = req.statusCode || responseStatus"
+            },
+            {
+                "block": 2,
+                "comment": "",
+                "operation": "* match responseStatus == expectedStatusCode"
+            },
+            {
+                "block": 3,
+                "comment": "Validate general schema",
+                "operation": "* def responseValidator = req.responseMatches? req.responseMatches : {}"
+            },
+            {
+                "block": 3,
+                "comment": "",
+                "operation": "* match response contains responseValidator"
+            }
+        ]
+    }
 }
