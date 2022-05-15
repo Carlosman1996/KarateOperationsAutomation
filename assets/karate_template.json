@@ -17,7 +17,7 @@
         "steps": [
             {
                 "block": 0,
-                "comment": "Pretest operations",
+                "comment": "",
                 "operation": "* def req = __arg"
             },
             {

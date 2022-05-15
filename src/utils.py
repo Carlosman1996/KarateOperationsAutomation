@@ -119,3 +119,9 @@ class YAMLFileOperations:
         FileOperations.check_file_exists(file_path)
         with open(file_path, 'r') as yaml_obj:
             return yaml.load(yaml_obj, Loader=yaml.FullLoader)
+
+
+class TextConverter:
+    @staticmethod
+    def snake_to_pascal_case(string):
+        return string.replace('_', ' ').title().replace(' ', '')

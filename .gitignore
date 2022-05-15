@@ -131,4 +131,5 @@ dmypy.json
 # PARTICULAR RESTRICTIONS
 .idea/
 docs/
+outputs/
 tools/
