@@ -1,4 +1,7 @@
 {
+    "tags": [
+        "@ignore"
+    ],
     "feature": {
         "comment": ""
     },

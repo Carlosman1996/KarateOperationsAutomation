@@ -125,3 +125,8 @@ class TextConverter:
     @staticmethod
     def snake_to_pascal_case(string):
         return string.replace('_', ' ').title().replace(' ', '')
+
+    @staticmethod
+    def snake_to_camel_case(string):
+        components = string.split('_')
+        return components[0] + ''.join(component.title() for component in components[1:])
