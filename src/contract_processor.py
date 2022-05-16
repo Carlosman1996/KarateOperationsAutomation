@@ -156,8 +156,7 @@ class ContractProcessor:
 
 if __name__ == "__main__":
     # Read JSON file - API contract information:
-    # api_document = JSONFileOperations.read_file(ROOT_PATH + "//inputs//response.json")
-    api_document = JSONFileOperations.read_file(ROOT_PATH + "//docs//swagger.json")
+    api_document = JSONFileOperations.read_file(ROOT_PATH + "//inputs//swagger.json")
 
     processor_obj = ContractProcessor()
     processor_obj.run(api_document)
