@@ -1,0 +1,29 @@
+{
+  "id": {
+    "type": "integer",
+    "format": "int64"
+  },
+  "category": {
+    "id": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "name": "string",
+  "photoUrls": [],
+  "tags": [
+    {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  ],
+  "status": "string"
+}

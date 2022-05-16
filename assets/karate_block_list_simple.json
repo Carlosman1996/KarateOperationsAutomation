@@ -1,0 +1,38 @@
+[
+    {
+      "comment": "Response level",
+      "operation": "* def response = response? response.length > 0? response : defaultResponse : defaultResponse"
+    },
+    {
+      "comment": "Validate response schema",
+      "operation": "* def responseValidator = req.responseMatches? req.responseMatches : []"
+    },
+    {
+      "comment": "",
+      "operation": "* match response contains responseValidator"
+    },
+    {
+      "comment": "Validate each element response schema",
+      "operation": "* def responseValidator = req.responseEachMatches? req.responseEachMatches : {}"
+    },
+    {
+      "comment": "",
+      "operation": "* def responseEach = req.responseEachMatches? response : [{}]"
+    },
+    {
+      "comment": "",
+      "operation": "* match each responseEach contains responseValidator"
+    },
+    {
+      "comment": "Validate element response index schema",
+      "operation": "* def responseIndexValidator = req.responseIndexMatches? req.responseIndexMatches : {}"
+    },
+    {
+      "comment": "",
+      "operation": "* def responseIndex = req.responseIndexMatches? response[req.index] : {}"
+    },
+    {
+      "comment": "",
+      "operation": "* match responseIndex contains responseIndexValidator"
+    }
+]
