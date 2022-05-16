@@ -20,7 +20,7 @@ class DirectoryOperations:
         if os.path.isdir(dir_path):
             return True
         else:
-            raise Exception("Directory does not exist.")
+            return False
 
     @staticmethod
     def create_dir(dir_path):

@@ -29,7 +29,8 @@ class KarateOperationsAutomation:
         self.karate_ops_obj = operations_builder.OperationsBuilder(logger_level=self.logger_level)
 
     def _create_operation_file(self, file_name, file_data):
-        DirectoryOperations.create_dir(self.output_path)
+        if not DirectoryOperations.check_dir_exists(self.output_path):
+            DirectoryOperations.create_dir(self.output_path)
         FileOperations.write_file(self.output_path + f"//{file_name}.feature", file_data)
 
     def run(self):
