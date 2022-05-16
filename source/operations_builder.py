@@ -61,7 +61,6 @@ class OperationsBuilder:
         # Create operations:
         if type(response) == list:
             block_index = self.karate_operations_dict["scenario"]["steps"][-1]["block"] + 1
-            operation_key_name = "General response"
 
             # Adapt operations block:
             karate_block_list = copy.deepcopy(self.karate_block_list_simple_template)
@@ -81,8 +80,8 @@ class OperationsBuilder:
                 if type(value_type) == list:
                     # Adapt operations block:
                     karate_block_list = copy.deepcopy(self.karate_block_list_complex_template)
-                    karate_block_list = rename_templates_variables(karate_block_list, block_index, operation_key_name, key,
-                                                                   last_key)
+                    karate_block_list = rename_templates_variables(karate_block_list, block_index, operation_key_name,
+                                                                   key, last_key)
 
                     # Set operations block:
                     self.karate_operations_dict["scenario"]["steps"] += karate_block_list
@@ -93,8 +92,8 @@ class OperationsBuilder:
                 elif type(value_type) == dict:
                     # Adapt operations block:
                     karate_block_object = copy.deepcopy(self.karate_block_object_template)
-                    karate_block_object = rename_templates_variables(karate_block_object, block_index, operation_key_name,
-                                                                     key, last_key)
+                    karate_block_object = rename_templates_variables(karate_block_object, block_index,
+                                                                     operation_key_name, key, last_key)
 
                     # Set operations block:
                     self.karate_operations_dict["scenario"]["steps"] += karate_block_object

@@ -126,7 +126,11 @@ class ContractProcessor:
                     # Read response:
                     possible_responses = content["responses"]
                     if "200" in possible_responses.keys():
-                        # Get value or model:
+                        # TODO: we don't have always the same structure: schema, description, etc. may change. Create
+                        #  an iterator to find the model. Examples:
+                        #  https://github.com/georgwittberger/openapi-contract-example/blob/master/microservice
+                        #  -application/src/main/resources/static/api/v1/microservice-api.json,
+                        #  https://swagger.io/docs/specification/basic-structure/ Get value or model:
                         if "schema" in possible_responses["200"].keys():
                             response = possible_responses["200"]["schema"]
 

@@ -1,0 +1,4 @@
+attrs==21.4.0
+jsonschema==4.4.0
+pyrsistent==0.18.1
+PyYAML==6.0

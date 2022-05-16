@@ -14,7 +14,7 @@ __email__ = "cmmolinas01@gmail.com"
 class KarateOperationsAutomation:
     def __init__(self,
                  input_file=ROOT_PATH + "//inputs//response.json",
-                 output_file=ROOT_PATH + "//outputs//operations.feature",
+                 # output_file=ROOT_PATH + "//outputs//operations.feature",
                  output_path=ROOT_PATH + "//outputs",
                  logger_level="INFO"):
         # Main attributes:
