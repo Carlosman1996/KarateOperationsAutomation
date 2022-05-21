@@ -59,6 +59,7 @@ class OperationsBuilder:
             return dictionary
 
         # Create operations:
+        # TODO: add default values to generalize operations: 200, 400, 401, ... must use the same operations file
         if type(response) == list:
             block_index = self.karate_operations_dict["scenario"]["steps"][-1]["block"] + 1
 

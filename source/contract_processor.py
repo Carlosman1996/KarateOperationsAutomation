@@ -91,6 +91,7 @@ class ContractProcessor:
     def _process_model_response(self, model):
         # Process response:
         model_response = self._process_model_data_types(model)
+
         # TODO: generalize types
         if type(model_response) == list:
             # At this moment, the array contains an object with information:
@@ -103,6 +104,41 @@ class ContractProcessor:
                 else:
                     model_response[property_element] = property_result
         return model_response
+
+    def _search_endpoint_response_schema(self, method_data):
+        result = None
+        for key, value in method_data.items():
+            # Schema contains the response information:
+            if key == "schema":
+                response = value
+
+                # Get model:
+                if "$ref" in response.keys():
+                    path_ref = method_data["schema"]["$ref"]
+                    api_model_response = self._read_model_definition(path_ref)
+                else:
+                    api_model_response = response
+                result = self._process_model_response(api_model_response)
+            elif type(value) == dict:
+                # Iterate over all dictionaries present in model:
+                result = self._search_endpoint_response_schema(value)
+
+            # Return result
+            if result:
+                return result
+        return None
+
+    @staticmethod
+    def _fill_missing_method_info(method_data):
+        if "tags" not in method_data:
+            method_data["tags"] = []
+        if "operationId" not in method_data:
+            method_data["operationId"] = ""
+        if "summary" not in method_data:
+            method_data["summary"] = ""
+        if "description" not in method_data:
+            method_data["description"] = ""
+        return method_data
 
     def run(self, api_doc):
         # Set api doc
@@ -131,25 +167,18 @@ class ContractProcessor:
                         #  https://github.com/georgwittberger/openapi-contract-example/blob/master/microservice
                         #  -application/src/main/resources/static/api/v1/microservice-api.json,
                         #  https://swagger.io/docs/specification/basic-structure/ Get value or model:
-                        if "schema" in possible_responses["200"].keys():
-                            response = possible_responses["200"]["schema"]
 
-                            # Get model:
-                            if "$ref" in response.keys():
-                                path_ref = possible_responses["200"]["schema"]["$ref"]
-                                api_model_response = self._read_model_definition(path_ref)
-                            else:
-                                api_model_response = possible_responses["200"]["schema"]
-                            complete_karate_model_response = self._process_model_response(api_model_response)
-                        else:
-                            self.api_doc_dict["response"] = possible_responses["200"]["description"]
+                        complete_karate_model_response = \
+                            self._search_endpoint_response_schema(possible_responses["200"])
 
                     # Simplify response:
                     simplified_karate_model_response = self._simplify_response(complete_karate_model_response)
 
                     # Set information:
+                    content = self._fill_missing_method_info(content)
+                    operationId_tag = "@" + content["operationId"] if content["operationId"] != "" else ""
                     self.api_doc_dict[operation_name_camel] = {
-                        "tags": ["@" + tag for tag in content["tags"]] + ["@" + content["operationId"]],
+                        "tags": ["@" + tag for tag in content["tags"]] + [operationId_tag],
                         "desciption": content["summary"] + ": " + content["description"],
                         "operation": content["operationId"],
                         "response": simplified_karate_model_response
