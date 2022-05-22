@@ -45,7 +45,8 @@ class OperationsBuilder:
             response = data
 
         # Rename templates variables:
-        def rename_templates_variables(dictionary, index, operation_key="", key_name="", last_key_name=""):
+        def _rename_templates_variables(dictionary, index, operation_key="", key_name="", last_key_name="",
+                                        default_response=""):
             for instruction in dictionary:
                 instruction["block"] = index
                 instruction["comment"] = \
@@ -56,7 +57,31 @@ class OperationsBuilder:
                     instruction["operation"].replace("<key>", key_name)
                 instruction["operation"] = \
                     instruction["operation"].replace("<previous_key>", last_key_name)
+                instruction["operation"] = \
+                    instruction["operation"].replace("<previous_key>", last_key_name)
+                instruction["operation"] = \
+                    instruction["operation"].replace(f"<default{operation_key}>", default_response)
             return dictionary
+
+        def _set_default_response(data):
+            def _set_dictionary(sub_dict):
+                result = {}
+                for key, value in sub_dict.items():
+                    if type(value) == dict:
+                        result[key] = {}
+                    elif type(value) == list:
+                        result[key] = []
+                return result
+
+            if type(data) == list:
+                if data:
+                    return str([_set_dictionary(data[0])] if type(data[0]) == dict else [])
+                else:
+                    return str([])
+            elif type(data) == dict:
+                return str(_set_dictionary(data))
+            else:
+                return ""
 
         # Create operations:
         # TODO: add default values to generalize operations: 200, 400, 401, ... must use the same operations file
@@ -65,7 +90,10 @@ class OperationsBuilder:
 
             # Adapt operations block:
             karate_block_list = copy.deepcopy(self.karate_block_list_simple_template)
-            karate_block_list = rename_templates_variables(karate_block_list, block_index)
+            block_default_response = _set_default_response(response)
+            karate_block_list = _rename_templates_variables(dictionary=karate_block_list,
+                                                            index=block_index,
+                                                            default_response=block_default_response)
 
             # Set operations block:
             self.karate_operations_dict["scenario"]["steps"] += karate_block_list
@@ -81,8 +109,13 @@ class OperationsBuilder:
                 if type(value_type) == list:
                     # Adapt operations block:
                     karate_block_list = copy.deepcopy(self.karate_block_list_complex_template)
-                    karate_block_list = rename_templates_variables(karate_block_list, block_index, operation_key_name,
-                                                                   key, last_key)
+                    block_default_response = _set_default_response(value_type)
+                    karate_block_list = _rename_templates_variables(dictionary=karate_block_list,
+                                                                    index=block_index,
+                                                                    operation_key=operation_key_name,
+                                                                    key_name=key,
+                                                                    last_key_name=last_key,
+                                                                    default_response=block_default_response)
 
                     # Set operations block:
                     self.karate_operations_dict["scenario"]["steps"] += karate_block_list
@@ -93,8 +126,13 @@ class OperationsBuilder:
                 elif type(value_type) == dict:
                     # Adapt operations block:
                     karate_block_object = copy.deepcopy(self.karate_block_object_template)
-                    karate_block_object = rename_templates_variables(karate_block_object, block_index,
-                                                                     operation_key_name, key, last_key)
+                    block_default_response = _set_default_response(value_type)
+                    karate_block_object = _rename_templates_variables(dictionary=karate_block_object,
+                                                                      index=block_index,
+                                                                      operation_key=operation_key_name,
+                                                                      key_name=key,
+                                                                      last_key_name=last_key,
+                                                                      default_response=block_default_response)
 
                     # Set operations block:
                     self.karate_operations_dict["scenario"]["steps"] += karate_block_object

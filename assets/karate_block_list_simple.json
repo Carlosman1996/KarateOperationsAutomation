@@ -1,6 +1,10 @@
 [
     {
       "comment": "Response level",
+      "operation": "* def defaultResponse = <default>"
+    },
+    {
+      "comment": "",
       "operation": "* def response = response? response.length > 0? response : defaultResponse : defaultResponse"
     },
     {

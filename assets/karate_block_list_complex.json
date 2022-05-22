@@ -1,7 +1,11 @@
 [
     {
       "comment": "<key_description> section",
-      "operation": "* def response<key_validation> = response<previous_key>.<key>? response<previous_key>.<key>.length > 0? response<previous_key>.<key> : default<key_validation> : default<key_validation>"
+      "operation": "* def default<key_validation> = <default<key_validation>>"
+    },
+    {
+      "comment": "",
+      "operation": "* def response<key_validation> = response<previous_key>[0].<key>? response<previous_key>[0].<key>.length > 0? response<previous_key>[0].<key> : default<key_validation> : default<key_validation>"
     },
     {
       "comment": "Validate <key_description> schema",

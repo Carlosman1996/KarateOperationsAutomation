@@ -1,6 +1,10 @@
 [
     {
       "comment": "<key_description> section",
+      "operation": "* def default<key_validation> = <default<key_validation>>"
+    },
+    {
+      "comment": "",
       "operation": "* def response<key_validation> = response<previous_key>.<key>? response<previous_key>.<key> : default<key_validation>"
     },
     {

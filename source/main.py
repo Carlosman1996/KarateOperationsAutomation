@@ -63,6 +63,7 @@ class KarateOperationsAutomation:
 
 
 if __name__ == "__main__":
-    karate_ops_auto_obj = KarateOperationsAutomation(input_file=ROOT_PATH + "//inputs//basicOpenAPI.yml")
+    # karate_ops_auto_obj = KarateOperationsAutomation(input_file=ROOT_PATH + "//inputs//basicOpenAPI.yml")
+    karate_ops_auto_obj = KarateOperationsAutomation(input_file=ROOT_PATH + "//inputs//swagger.json")
 
     karate_ops_auto_obj.run()
