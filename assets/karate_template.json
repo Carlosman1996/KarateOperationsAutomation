@@ -31,12 +31,22 @@
             {
                 "block": 0,
                 "comment": "",
+                "operation": "* def params = req.params || {}"
+            },
+            {
+                "block": 0,
+                "comment": "",
                 "operation": "* def headers = karate.merge(req.headers || {}, authHeader || {})"
+            },
+            {
+                "block": 0,
+                "comment": "",
+                "operation": "* def body = req.body || {}"
             },
             {
                 "block": 1,
                 "comment": "HTTP call",
-                "operation": "Given path"
+                "operation": "Given path <endpoint>"
             },
             {
                 "block": 1,
@@ -51,7 +61,12 @@
             {
                 "block": 1,
                 "comment": "",
-                "operation": "When method GET"
+                "operation": "And body body"
+            },
+            {
+                "block": 1,
+                "comment": "",
+                "operation": "When method <method>"
             },
             {
                 "block": 2,

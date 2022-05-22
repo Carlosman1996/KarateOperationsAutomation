@@ -28,17 +28,26 @@ class OperationsBuilder:
             JSONFileOperations.read_file(self.karate_block_list_complex_template_path)
         self.karate_block_object_template = JSONFileOperations.read_file(self.karate_block_object_template_path)
 
+    def _set_operations_dict_general_info(self, data):
+        self.karate_operations_dict["tags"] += data["tags"] if data["tags"] else []
+        self.karate_operations_dict["feature"]["comment"] = \
+            data["operation"] + " validator" if data["operation"] else ""
+        self.karate_operations_dict["scenario"]["comment"] = \
+            data["operation"] + " validator" if data["operation"] else ""
+
+        for step in self.karate_operations_dict["scenario"]["steps"]:
+            if "<endpoint>" in step["operation"]:
+                step["operation"] = step["operation"].replace("<endpoint>", data["karate_path"])
+            if "<method>" in step["operation"]:
+                step["operation"] = step["operation"].replace("<method>", data["method"])
+
     def _operations_dict_builder(self, data, last_key=""):
         # Set operations dict file:
         if not self.karate_operations_dict:
             self.karate_operations_dict = copy.deepcopy(self.karate_operations_template_dict)
 
             # Set general information:
-            self.karate_operations_dict["tags"] += data["tags"] if data["tags"] else []
-            self.karate_operations_dict["feature"]["comment"] = \
-                data["operation"] + " validator" if data["operation"] else ""
-            self.karate_operations_dict["scenario"]["comment"] = \
-                data["operation"] + " validator" if data["operation"] else ""
+            self._set_operations_dict_general_info(data)
 
             response = data["response"]
         else:
@@ -84,7 +93,6 @@ class OperationsBuilder:
                 return ""
 
         # Create operations:
-        # TODO: add default values to generalize operations: 200, 400, 401, ... must use the same operations file
         if type(response) == list:
             block_index = self.karate_operations_dict["scenario"]["steps"][-1]["block"] + 1
 

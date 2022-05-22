@@ -140,6 +140,25 @@ class ContractProcessor:
             method_data["description"] = ""
         return method_data
 
+    @staticmethod
+    def _set_karate_path(path):
+        karate_path = "'"
+        subpaths = path.split('/')
+        index_last_subpath = len(subpaths) - 1
+        for index, subpath in enumerate(subpaths):
+            if subpath == '':
+                pass
+            elif '{' in subpath or '}' in subpath:
+                identifier = subpath.replace('{', '').replace('}', '')
+                karate_path += f"/' + req.{identifier}"
+                if index != index_last_subpath:
+                    karate_path += " + '"
+            else:
+                karate_path += "/" + subpath
+                if index == index_last_subpath:
+                    karate_path += "'"
+        return karate_path
+
     def run(self, api_doc):
         # Set api doc
         self.api_doc = api_doc
@@ -162,12 +181,6 @@ class ContractProcessor:
                     # Read response:
                     possible_responses = content["responses"]
                     if "200" in possible_responses.keys():
-                        # TODO: we don't have always the same structure: schema, description, etc. may change. Create
-                        #  an iterator to find the model. Examples:
-                        #  https://github.com/georgwittberger/openapi-contract-example/blob/master/microservice
-                        #  -application/src/main/resources/static/api/v1/microservice-api.json,
-                        #  https://swagger.io/docs/specification/basic-structure/ Get value or model:
-
                         complete_karate_model_response = \
                             self._search_endpoint_response_schema(possible_responses["200"])
 
@@ -178,6 +191,9 @@ class ContractProcessor:
                     content = self._fill_missing_method_info(content)
                     operationId_tag = "@" + content["operationId"] if content["operationId"] != "" else ""
                     self.api_doc_dict[operation_name_camel] = {
+                        "endpoint": path,
+                        "karate_path": self._set_karate_path(path),
+                        "method": method.upper(),
                         "tags": ["@" + tag for tag in content["tags"]] + [operationId_tag],
                         "desciption": content["summary"] + ": " + content["description"],
                         "operation": content["operationId"],

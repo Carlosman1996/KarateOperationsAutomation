@@ -16,14 +16,14 @@ class KarateOperationsAutomation:
     def __init__(self,
                  input_file=ROOT_PATH + "//inputs//swagger.json",
                  # output_file=ROOT_PATH + "//outputs//operations.feature",
-                 output_path=ROOT_PATH + "//outputs",
+                 outputs_path=ROOT_PATH + "//outputs",
                  logger_level="INFO"):
         # Main attributes:
         self.logger_level = logger_level
         self.input_file = input_file
-        self.output_path = output_path
-        # self.output_file = output_file
-        # self.output_path = "//".join(self.output_file.split("//")[:-1])
+        self.outputs_path = outputs_path
+        self.outputs_operations_path = self.outputs_path + "//operations"
+        self.outputs_tests_path = self.outputs_path + "//tests"
 
         # Instantiate objects:
         self.rest_contract_obj = contract_processor.ContractProcessor(logger_level=self.logger_level)
@@ -43,9 +43,9 @@ class KarateOperationsAutomation:
             raise Exception(f"Unsupported file type: {file_type}")
 
     def _create_operation_file(self, file_name, file_data):
-        if not DirectoryOperations.check_dir_exists(self.output_path):
-            DirectoryOperations.create_dir(self.output_path)
-        FileOperations.write_file(self.output_path + f"//{file_name}.feature", file_data)
+        if not DirectoryOperations.check_dir_exists(self.outputs_operations_path):
+            DirectoryOperations.create_dir(self.outputs_operations_path)
+        FileOperations.write_file(self.outputs_operations_path + f"//{file_name}.feature", file_data)
 
     def run(self):
         # Read JSON file - API contract information:
