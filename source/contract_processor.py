@@ -159,13 +159,30 @@ class ContractProcessor:
                     karate_path += "'"
         return karate_path
 
+    def _set_method_information(self, path, method, operation_name, method_info, karate_model_response):
+        # Simplify response:
+        simplified_karate_model_response = self._simplify_response(karate_model_response)
+
+        # Set information:
+        content = self._fill_missing_method_info(method_info)
+        operationId_tag = "@" + content["operationId"] if content["operationId"] != "" else ""
+        self.api_doc_dict[operation_name] = {
+            "endpoint": path,
+            "karate_path": self._set_karate_path(path),
+            "method": method.upper(),
+            "tags": ["@" + tag for tag in content["tags"]] + [operationId_tag],
+            "desciption": content["summary"] + ": " + content["description"],
+            "operation": content["operationId"],
+            "response": simplified_karate_model_response
+        }
+
     def run(self, api_doc):
         # Set api doc
         self.api_doc = api_doc
 
         # Iterate over each endpoint:
         for path, methods in self.api_doc["paths"].items():
-            for method, content in methods.items():
+            for method, method_info in methods.items():
                 # "tags" and "operationId" fields must be tags of controller feature
                 # "summary" and "description" fields must be the description of controller feature
                 # "operationId" field must be the description of operations feature
@@ -173,34 +190,33 @@ class ContractProcessor:
                 operation_name_snake = path.replace('/', '_').replace('{', '_').replace('}', '') + "_" + method
                 operation_name_camel = TextConverter.snake_to_camel_case(operation_name_snake)
 
-                if method == "get":
-                    # Initialize main parameters:
-                    # TODO: add preprocessing stage: some fields could not be written
-                    complete_karate_model_response = None
-
-                    # Read response:
-                    possible_responses = content["responses"]
-                    if "200" in possible_responses.keys():
-                        complete_karate_model_response = \
-                            self._search_endpoint_response_schema(possible_responses["200"])
-
-                    # Simplify response:
-                    simplified_karate_model_response = self._simplify_response(complete_karate_model_response)
-
-                    # Set information:
-                    content = self._fill_missing_method_info(content)
-                    operationId_tag = "@" + content["operationId"] if content["operationId"] != "" else ""
-                    self.api_doc_dict[operation_name_camel] = {
-                        "endpoint": path,
-                        "karate_path": self._set_karate_path(path),
-                        "method": method.upper(),
-                        "tags": ["@" + tag for tag in content["tags"]] + [operationId_tag],
-                        "desciption": content["summary"] + ": " + content["description"],
-                        "operation": content["operationId"],
-                        "response": simplified_karate_model_response
-                    }
+                # Initialize main parameters:
+                # TODO: add preprocessing stage: some fields could not be written
+                karate_model_response = None
+                # Read response:
+                possible_responses = method_info["responses"]
+                if "200" in possible_responses.keys():
+                    response_type = "200"
+                elif "201" in possible_responses.keys():
+                    response_type = "201"
+                elif "default" in possible_responses.keys():
+                    response_type = "default"
                 else:
-                    print(f"Method {method} in path {operation_name_camel} is not supported in current version.")
+                    response_type = None
+
+                if response_type:
+                    karate_model_response = self._search_endpoint_response_schema(possible_responses[response_type])
+                    self._set_method_information(path=path,
+                                                 method=method,
+                                                 operation_name=operation_name_camel,
+                                                 method_info=method_info,
+                                                 karate_model_response=karate_model_response)
+                else:
+                    self._set_method_information(path=path,
+                                                 method=method,
+                                                 operation_name=operation_name_camel,
+                                                 method_info=method_info,
+                                                 karate_model_response="")
 
 
 if __name__ == "__main__":
