@@ -186,8 +186,15 @@ class OperationsBuilder:
 if __name__ == "__main__":
     karate_ops_obj = OperationsBuilder()
 
-    api_doc = {"response": {'id': {}, 'category': {'id': {}, 'name': {}}, 'photoUrls': [], 'tags': [{'id': {}, 'name': {}}]},
-               "tags": [],
-               "operation": ""}
+    api_doc = {
+        "desciption": "",
+        "endpoint": "",
+        "karate_path": "",
+        "method": "",
+        "operation": "",
+        "response": {'id': {}, 'category': {'id': {}, 'name': {}}, 'photoUrls': [], 'tags': [{'id': {}, 'name': {}}]},
+        "tags": []
+    }
+
     karate_ops_obj.run(api_doc)
     print(karate_ops_obj.karate_operations_feature)

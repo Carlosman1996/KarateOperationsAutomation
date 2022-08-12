@@ -159,14 +159,48 @@ class ContractProcessor:
                     karate_path += "'"
         return karate_path
 
-    def _set_method_information(self, path, method, operation_name, method_info, karate_model_response):
+    def _set_request_information(self, method_info):
+        def _set_parameter(request_dict, param_name, param_type):
+            if request_dict is None:
+                request_dict = {}
+
+            if param_type == "integer" or param_type == "number":
+                request_dict[param_name] = 0
+            elif param_type == "string":
+                request_dict[param_name] = "string"
+            elif param_type == "boolean":
+                request_dict[param_name] = True
+            else:
+                # TODO: raise NotImplementedError
+                request_dict[param_name] = None
+            return request_dict
+
+        request = {
+            "headers": None,
+            "params": None,
+            "body": None
+        }
+        if "parameters" in method_info.keys():
+            for parameter in method_info["parameters"]:
+                if parameter["in"] == "header":
+                    request["headers"] = _set_parameter(request["headers"], parameter["name"], parameter["type"])
+                elif parameter["in"] == "path":
+                    request["params"] = _set_parameter(request["params"], parameter["name"], parameter["type"])
+                elif parameter["in"] == "formData":
+                    request["body"] = _set_parameter(request["body"], parameter["name"], parameter["type"])
+                else:
+                    pass
+                    # TODO: raise NotImplementedError
+        return request
+
+    def _set_method_information(self, path, method, method_info, karate_model_response):
         # Simplify response:
         simplified_karate_model_response = self._simplify_response(karate_model_response)
 
         # Set information:
         content = self._fill_missing_method_info(method_info)
         operationId_tag = "@" + content["operationId"] if content["operationId"] != "" else ""
-        self.api_doc_dict[operation_name] = {
+        return {
             "endpoint": path,
             "karate_path": self._set_karate_path(path),
             "method": method.upper(),
@@ -175,6 +209,44 @@ class ContractProcessor:
             "operation": content["operationId"],
             "response": simplified_karate_model_response
         }
+
+    def _set_test_matches(self, karate_model_response, match_key=None):
+        if karate_model_response is None:
+            return None
+        else:
+            test = {}
+
+        # Set match name:
+        if match_key is None:
+            match_key_capitalized = ""
+        elif len(match_key) > 1:
+            match_key_capitalized = match_key[0].upper() + match_key[1:]
+        else:
+            match_key_capitalized = match_key[0].upper()
+
+        # Set match test:
+        if type(karate_model_response) == list:
+            test["response" + match_key_capitalized + "Matches"] = "#array"
+            test = {**test, **self._set_test_matches(karate_model_response[0],
+                                                     match_key=match_key_capitalized + "Each")}
+        elif type(karate_model_response) == dict:
+            response_matches_key = "response" + match_key_capitalized + "Matches"
+            test[response_matches_key] = {}
+            for key, value in karate_model_response.items():
+                if type(value) == dict:
+                    test[response_matches_key][key] = '#object'
+                    # Iterate over all dictionaries present in model:
+                    test = {**test, **self._set_test_matches(value, match_key=key)}    # merge two dictionaries
+                elif type(value) == list:
+                    test[response_matches_key][key] = '#array'
+                    # Iterate over all dictionaries present in model:
+                    if value:
+                        test = {**test, **self._set_test_matches(value, match_key=key)}
+                else:
+                    test[response_matches_key][key] = '#' + value
+        else:
+            test["response" + match_key_capitalized + "Matches"] = "#" + karate_model_response
+        return test
 
     def run(self, api_doc):
         # Set api doc
@@ -192,8 +264,8 @@ class ContractProcessor:
 
                 # Initialize main parameters:
                 # TODO: add preprocessing stage: some fields could not be written
-                karate_model_response = None
-                # Read response:
+
+                # Set main information:
                 possible_responses = method_info["responses"]
                 if "200" in possible_responses.keys():
                     response_type = "200"
@@ -206,17 +278,28 @@ class ContractProcessor:
 
                 if response_type:
                     karate_model_response = self._search_endpoint_response_schema(possible_responses[response_type])
-                    self._set_method_information(path=path,
-                                                 method=method,
-                                                 operation_name=operation_name_camel,
-                                                 method_info=method_info,
-                                                 karate_model_response=karate_model_response)
+                    self.api_doc_dict[operation_name_camel] = \
+                        self._set_method_information(path=path,
+                                                     method=method,
+                                                     method_info=method_info,
+                                                     karate_model_response=karate_model_response)
                 else:
-                    self._set_method_information(path=path,
-                                                 method=method,
-                                                 operation_name=operation_name_camel,
-                                                 method_info=method_info,
-                                                 karate_model_response="")
+                    self.api_doc_dict[operation_name_camel] = \
+                        self._set_method_information(path=path,
+                                                     method=method,
+                                                     method_info=method_info,
+                                                     karate_model_response="")
+
+                # Set request parameters:
+                self.api_doc_dict[operation_name_camel]["request"] = self._set_request_information(method_info)
+
+                # Set tests:
+                self.api_doc_dict[operation_name_camel]["tests"] = []
+                if "responses" in method_info:
+                    for response_status, response_info in method_info["responses"].items():
+                        karate_model_response = self._search_endpoint_response_schema(response_info)
+                        self.api_doc_dict[operation_name_camel]["tests"].append(
+                            {str(response_status): self._set_test_matches(karate_model_response=karate_model_response)})
 
 
 if __name__ == "__main__":

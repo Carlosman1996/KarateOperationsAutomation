@@ -16,7 +16,7 @@ Scenario:
   And headers headers
   When method GET
 
-  * def expectedStatusCode = req.statusCode || responseStatus
+  * def expectedStatusCode = req.statusCodeMatches || responseStatus
   * match responseStatus == expectedStatusCode
 
   # Validate schema:

@@ -1,3 +1,6 @@
+import os
+from datetime import datetime
+
 import contract_processor
 import operations_builder
 
@@ -15,13 +18,15 @@ __email__ = "cmmolinas01@gmail.com"
 class KarateOperationsAutomation:
     def __init__(self,
                  input_file=ROOT_PATH + "//inputs//swagger.json",
-                 # output_file=ROOT_PATH + "//outputs//operations.feature",
-                 outputs_path=ROOT_PATH + "//outputs",
+                 outputs_path=None,
                  logger_level="INFO"):
         # Main attributes:
         self.logger_level = logger_level
         self.input_file = input_file
-        self.outputs_path = outputs_path
+        if outputs_path:
+            self.outputs_path = outputs_path
+        else:
+            self.outputs_path = ROOT_PATH + "//outputs//" + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.outputs_operations_path = self.outputs_path + "//operations"
         self.outputs_tests_path = self.outputs_path + "//tests"
 
