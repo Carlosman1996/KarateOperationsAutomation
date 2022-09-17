@@ -159,6 +159,7 @@ class ContractProcessor:
                     karate_path += "'"
         return karate_path
 
+
     def _set_request_information(self, method_info):
         def _set_parameter(request_dict, param_name, param_type):
             if request_dict is None:
@@ -177,6 +178,7 @@ class ContractProcessor:
 
         request = {
             "headers": None,
+            "path": None,
             "params": None,
             "body": None
         }
@@ -185,9 +187,11 @@ class ContractProcessor:
                 if parameter["in"] == "header":
                     request["headers"] = _set_parameter(request["headers"], parameter["name"], parameter["type"])
                 elif parameter["in"] == "path":
-                    request["params"] = _set_parameter(request["params"], parameter["name"], parameter["type"])
+                    request["path"] = _set_parameter(request["path"], parameter["name"], parameter["type"])
                 elif parameter["in"] == "formData":
-                    request["body"] = _set_parameter(request["body"], parameter["name"], parameter["type"])
+                    request["params"] = _set_parameter(request["params"], parameter["name"], parameter["type"])
+                elif parameter["in"] == "body":
+                    request["body"] = self._search_endpoint_response_schema(parameter)
                 else:
                     pass
                     # TODO: raise NotImplementedError
@@ -207,7 +211,8 @@ class ContractProcessor:
             "tags": ["@" + tag for tag in content["tags"]] + [operationId_tag],
             "desciption": content["summary"] + ": " + content["description"],
             "operation": content["operationId"],
-            "response": simplified_karate_model_response
+            "response": karate_model_response,
+            "response_karate_model": simplified_karate_model_response
         }
 
     def _set_test_matches(self, karate_model_response, match_key=None):

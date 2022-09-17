@@ -120,6 +120,11 @@ class YAMLFileOperations:
         with open(file_path, 'r') as yaml_obj:
             return yaml.load(yaml_obj, Loader=yaml.FullLoader)
 
+    @staticmethod
+    def write_file(file_path, string):
+        with open(file_path, 'w') as yaml_obj:
+            yaml.dump(string, yaml_obj, default_flow_style=False)
+
 
 class TextConverter:
     @staticmethod

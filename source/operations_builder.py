@@ -49,7 +49,7 @@ class OperationsBuilder:
             # Set general information:
             self._set_operations_dict_general_info(data)
 
-            response = data["response"]
+            response = data["response_karate_model"]
         else:
             response = data
 
@@ -192,7 +192,8 @@ if __name__ == "__main__":
         "karate_path": "",
         "method": "",
         "operation": "",
-        "response": {'id': {}, 'category': {'id': {}, 'name': {}}, 'photoUrls': [], 'tags': [{'id': {}, 'name': {}}]},
+        "response_karate_model":
+            {'id': {}, 'category': {'id': {}, 'name': {}}, 'photoUrls': [], 'tags': [{'id': {}, 'name': {}}]},
         "tags": []
     }
 

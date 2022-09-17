@@ -27,6 +27,8 @@ class KarateOperationsAutomation:
             self.outputs_path = outputs_path
         else:
             self.outputs_path = ROOT_PATH + "//outputs//" + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        self.outputs_temp_path = self.outputs_path + "//_temp"
+        self.outputs_models_path = self.outputs_path + "//models"
         self.outputs_operations_path = self.outputs_path + "//operations"
         self.outputs_tests_path = self.outputs_path + "//tests"
 
@@ -47,10 +49,21 @@ class KarateOperationsAutomation:
         else:
             raise Exception(f"Unsupported file type: {file_type}")
 
+    def _create_temp_file(self, file_name, file_data):
+        if not DirectoryOperations.check_dir_exists(self.outputs_temp_path):
+            DirectoryOperations.create_dir(self.outputs_temp_path)
+        JSONFileOperations.write_file(self.outputs_temp_path + f"//{file_name}.json", file_data)
+
     def _create_operation_file(self, file_name, file_data):
         if not DirectoryOperations.check_dir_exists(self.outputs_operations_path):
             DirectoryOperations.create_dir(self.outputs_operations_path)
         FileOperations.write_file(self.outputs_operations_path + f"//{file_name}.feature", file_data)
+
+    def _create_model_file(self, directory_name, file_name, file_data):
+        directory_name = self.outputs_models_path + '//' + directory_name
+        if not DirectoryOperations.check_dir_exists(directory_name):
+            DirectoryOperations.create_dir(directory_name)
+        YAMLFileOperations.write_file(directory_name + f"//{file_name}.yml", file_data)
 
     def run(self):
         # Read JSON file - API contract information:
@@ -59,8 +72,24 @@ class KarateOperationsAutomation:
         # Process API contract:
         self.rest_contract_obj.run(api_doc)
 
-        # Create operations files:
+        # Generate tests files:
         for endpoint, data in self.rest_contract_obj.api_doc_dict.items():
+            # TEMPORAL FILE:
+            self._create_temp_file(endpoint, data)
+
+            # SCHEMAS:
+            # Generate body:
+            request_body = data["request"]["body"]
+            if request_body is not None:
+                self._create_model_file(endpoint, "body", request_body)
+
+            # Generate response:
+            response = data["response"]
+            if response is not None:
+                self._create_model_file(endpoint, "response", response)
+
+            # OPERATIONS:
+            # Create operations file:
             self.karate_ops_obj.run(data)
 
             # Save file:
