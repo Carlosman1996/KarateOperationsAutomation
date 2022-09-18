@@ -197,9 +197,7 @@ class ContractProcessor:
                     # TODO: raise NotImplementedError
         return request
 
-    def _set_method_information(self, path, method, method_info, karate_model_response):
-        # Simplify response:
-        simplified_karate_model_response = self._simplify_response(karate_model_response)
+    def _set_method_information(self, path, method, method_info):
 
         # Set information:
         content = self._fill_missing_method_info(method_info)
@@ -211,6 +209,16 @@ class ContractProcessor:
             "tags": ["@" + tag for tag in content["tags"]] + [operationId_tag],
             "desciption": content["summary"] + ": " + content["description"],
             "operation": content["operationId"],
+            "responses": []
+        }
+
+    def _set_response_information(self, status_code, karate_model_response):
+        # Simplify response:
+        simplified_karate_model_response = self._simplify_response(karate_model_response)
+
+        # Set information:
+        return {
+            "status_code": status_code,
             "response": karate_model_response,
             "response_karate_model": simplified_karate_model_response
         }
@@ -271,40 +279,28 @@ class ContractProcessor:
                 # TODO: add preprocessing stage: some fields could not be written
 
                 # Set main information:
-                possible_responses = method_info["responses"]
-                if "200" in possible_responses.keys():
-                    response_type = "200"
-                elif "201" in possible_responses.keys():
-                    response_type = "201"
-                elif "default" in possible_responses.keys():
-                    response_type = "default"
-                else:
-                    response_type = None
+                self.api_doc_dict[operation_name_camel] = \
+                    self._set_method_information(path=path,
+                                                 method=method,
+                                                 method_info=method_info)
 
-                if response_type:
-                    karate_model_response = self._search_endpoint_response_schema(possible_responses[response_type])
-                    self.api_doc_dict[operation_name_camel] = \
-                        self._set_method_information(path=path,
-                                                     method=method,
-                                                     method_info=method_info,
-                                                     karate_model_response=karate_model_response)
-                else:
-                    self.api_doc_dict[operation_name_camel] = \
-                        self._set_method_information(path=path,
-                                                     method=method,
-                                                     method_info=method_info,
-                                                     karate_model_response="")
+                # Set response for each status code:
+                possible_responses = method_info["responses"]
+                for status_code, response in possible_responses.items():
+                    karate_model_response = self._search_endpoint_response_schema(response)
+                    self.api_doc_dict[operation_name_camel]["responses"].append(
+                        self._set_response_information(status_code, karate_model_response))
 
                 # Set request parameters:
                 self.api_doc_dict[operation_name_camel]["request"] = self._set_request_information(method_info)
 
-                # Set tests:
-                self.api_doc_dict[operation_name_camel]["tests"] = []
-                if "responses" in method_info:
-                    for response_status, response_info in method_info["responses"].items():
-                        karate_model_response = self._search_endpoint_response_schema(response_info)
-                        self.api_doc_dict[operation_name_camel]["tests"].append(
-                            {str(response_status): self._set_test_matches(karate_model_response=karate_model_response)})
+                # # Set tests:
+                # self.api_doc_dict[operation_name_camel]["tests"] = []
+                # if "responses" in method_info:
+                #     for response_status, response_info in method_info["responses"].items():
+                #         karate_model_response = self._search_endpoint_response_schema(response_info)
+                #         self.api_doc_dict[operation_name_camel]["tests"].append(
+                #             {str(response_status): self._set_test_matches(karate_model_response=karate_model_response)})
 
 
 if __name__ == "__main__":

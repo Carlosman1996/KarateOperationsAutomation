@@ -88,12 +88,12 @@ class KarateOperationsAutomation:
             if response is not None:
                 self._create_model_file(endpoint, "response", response)
 
-            # OPERATIONS:
-            # Create operations file:
-            self.karate_ops_obj.run(data)
-
-            # Save file:
-            self._create_operation_file(endpoint, self.karate_ops_obj.karate_operations_feature)
+            # # OPERATIONS:
+            # # Create operations file:
+            # self.karate_ops_obj.run(data)
+            #
+            # # Save file:
+            # self._create_operation_file(endpoint, self.karate_ops_obj.karate_operations_feature)
 
 
 if __name__ == "__main__":
