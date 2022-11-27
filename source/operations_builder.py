@@ -49,7 +49,11 @@ class OperationsBuilder:
             # Set general information:
             self._set_operations_dict_general_info(data)
 
-            response = data["response_karate_model"]
+            # TODO: implement robust and scalable way to find higher complexity operation:
+            if len(data["responses"]) > 0:
+                response = data["responses"][0]["response_karate_model"]
+            else:
+                response = None
         else:
             response = data
 
@@ -187,14 +191,63 @@ if __name__ == "__main__":
     karate_ops_obj = OperationsBuilder()
 
     api_doc = {
-        "desciption": "",
-        "endpoint": "",
-        "karate_path": "",
-        "method": "",
-        "operation": "",
-        "response_karate_model":
-            {'id': {}, 'category': {'id': {}, 'name': {}}, 'photoUrls': [], 'tags': [{'id': {}, 'name': {}}]},
-        "tags": []
+        "endpoint": "/pet/{petId}",
+        "karate_path": "'/pet/' + req.petId",
+        "method": "GET",
+        "tags": [
+            "@get-getPetById",
+            "@pet"
+        ],
+        "desciption": "Find pet by ID: Returns a single pet",
+        "operation": "getPetById",
+        "responses": [
+            {
+                "status_code": "200",
+                "response": {
+                    "id": "number",
+                    "category": {
+                        "id": "number",
+                        "name": "string"
+                    },
+                    "name": "string",
+                    "photoUrls": [
+                        "string"
+                    ],
+                    "tags": [
+                        {
+                            "id": "number",
+                            "name": "string"
+                        }
+                    ],
+                    "status": "string"
+                },
+                "response_karate_model": {
+                    "category": {},
+                    "photoUrls": [],
+                    "tags": [
+                        {}
+                    ]
+                }
+            },
+            {
+                "status_code": "400",
+                "response": None,
+                "response_karate_model": None
+            },
+            {
+                "status_code": "404",
+                "response": None,
+                "response_karate_model": None
+            }
+        ],
+        "request": {
+            "headers": None,
+            "path": {
+                "petId": 0
+            },
+            "params": None,
+            "body": None
+        }
     }
 
     karate_ops_obj.run(api_doc)

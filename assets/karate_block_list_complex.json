@@ -16,6 +16,14 @@
       "operation": "* match response<key_validation> contains response<key_validation>Validator"
     },
     {
+      "comment": "Validate exact <key_description> schema",
+      "operation": "* def response<key_validation>Validator = req.response<key_validation>ExactMatches? req.response<key_validation>ExactMatches : []"
+    },
+    {
+      "comment": "",
+      "operation": "* match response<key_validation> == response<key_validation>Validator"
+    },
+    {
       "comment": "Validate each element <key_description> schema",
       "operation": "* def response<key_validation>Validator = req.response<key_validation>EachMatches? req.response<key_validation>EachMatches : {}"
     },

@@ -16,6 +16,14 @@
       "operation": "* match response contains responseValidator"
     },
     {
+      "comment": "Validate exact response schema",
+      "operation": "* def responseValidator = req.responseEqualsMatches? req.responseEqualsMatches : []"
+    },
+    {
+      "comment": "",
+      "operation": "* match response == responseValidator"
+    },
+    {
       "comment": "Validate each element response schema",
       "operation": "* def responseValidator = req.responseEachMatches? req.responseEachMatches : {}"
     },
