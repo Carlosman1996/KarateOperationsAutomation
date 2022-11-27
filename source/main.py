@@ -29,8 +29,11 @@ class KarateOperationsAutomation:
             self.outputs_path = ROOT_PATH + "//outputs//" + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.outputs_temp_path = self.outputs_path + "//_temp"
         self.outputs_models_path = self.outputs_path + "//models"
-        self.outputs_operations_path = self.outputs_path + "//operations"
+        self.outputs_endpoints_path = self.outputs_path + "//endpoints"
         self.outputs_tests_path = self.outputs_path + "//tests"
+        self.outputs_operations_path = self.outputs_path + "//operations"
+        # self.outputs_requests_path = self.outputs_endpoints_path + "//requests"
+        # self.outputs_operations_path = self.outputs_endpoints_path + "//operations"
 
         # Instantiate objects:
         self.rest_contract_obj = contract_processor.ContractProcessor(logger_level=self.logger_level)
@@ -84,16 +87,19 @@ class KarateOperationsAutomation:
                 self._create_model_file(endpoint, "body", request_body)
 
             # Generate response:
-            response = data["response"]
-            if response is not None:
-                self._create_model_file(endpoint, "response", response)
+            responses = data["responses"]
+            for response in responses:
+                if response['response'] is not None:
+                    self._create_model_file(endpoint, f"response_{response['status_code']}", response['response'])
+                else:
+                    self._create_model_file(endpoint, f"response_{response['status_code']}", "")
 
-            # # OPERATIONS:
-            # # Create operations file:
-            # self.karate_ops_obj.run(data)
-            #
-            # # Save file:
-            # self._create_operation_file(endpoint, self.karate_ops_obj.karate_operations_feature)
+            # OPERATIONS:
+            # Create operations file:
+            self.karate_ops_obj.run(data)
+
+            # Save file:
+            self._create_operation_file(endpoint, self.karate_ops_obj.karate_operations_feature)
 
 
 if __name__ == "__main__":

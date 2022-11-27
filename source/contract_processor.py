@@ -201,12 +201,12 @@ class ContractProcessor:
 
         # Set information:
         content = self._fill_missing_method_info(method_info)
-        operationId_tag = "@" + content["operationId"] if content["operationId"] != "" else ""
+        operationId_tag = "@" + method + "-" + content["operationId"] if content["operationId"] != "" else ""
         return {
             "endpoint": path,
             "karate_path": self._set_karate_path(path),
             "method": method.upper(),
-            "tags": ["@" + tag for tag in content["tags"]] + [operationId_tag],
+            "tags": [operationId_tag] + ["@" + tag for tag in content["tags"]],
             "desciption": content["summary"] + ": " + content["description"],
             "operation": content["operationId"],
             "responses": []
@@ -272,7 +272,7 @@ class ContractProcessor:
                 # "summary" and "description" fields must be the description of controller feature
                 # "operationId" field must be the description of operations feature
 
-                operation_name_snake = path.replace('/', '_').replace('{', '_').replace('}', '') + "_" + method
+                operation_name_snake = method + "-" + path.replace('/', '_').replace('{', '_').replace('}', '')
                 operation_name_camel = TextConverter.snake_to_camel_case(operation_name_snake)
 
                 # Initialize main parameters:
