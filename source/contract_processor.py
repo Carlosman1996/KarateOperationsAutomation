@@ -126,6 +126,9 @@ class ContractProcessor:
             # Return result
             if result:
                 return result
+
+        if "description" in method_data.keys():
+            return method_data["description"]
         return None
 
     @staticmethod
@@ -207,7 +210,7 @@ class ContractProcessor:
             "karate_path": self._set_karate_path(path),
             "method": method.upper(),
             "tags": [operationId_tag] + ["@" + tag for tag in content["tags"]],
-            "desciption": content["summary"] + ": " + content["description"],
+            "description": content["summary"] + ": " + content["description"],
             "operation": content["operationId"],
             "responses": []
         }

@@ -61,7 +61,7 @@
             {
                 "block": 1,
                 "comment": "",
-                "operation": "And body body"
+                "operation": "And request body"
             },
             {
                 "block": 1,

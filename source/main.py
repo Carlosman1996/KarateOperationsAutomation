@@ -28,12 +28,8 @@ class KarateOperationsAutomation:
         else:
             self.outputs_path = ROOT_PATH + "//outputs//" + datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.outputs_temp_path = self.outputs_path + "//_temp"
-        self.outputs_models_path = self.outputs_path + "//models"
         self.outputs_endpoints_path = self.outputs_path + "//endpoints"
         self.outputs_tests_path = self.outputs_path + "//tests"
-        self.outputs_operations_path = self.outputs_path + "//operations"
-        # self.outputs_requests_path = self.outputs_endpoints_path + "//requests"
-        # self.outputs_operations_path = self.outputs_endpoints_path + "//operations"
 
         # Instantiate objects:
         self.rest_contract_obj = contract_processor.ContractProcessor(logger_level=self.logger_level)
@@ -57,16 +53,17 @@ class KarateOperationsAutomation:
             DirectoryOperations.create_dir(self.outputs_temp_path)
         JSONFileOperations.write_file(self.outputs_temp_path + f"//{file_name}.json", file_data)
 
-    def _create_operation_file(self, file_name, file_data):
-        if not DirectoryOperations.check_dir_exists(self.outputs_operations_path):
-            DirectoryOperations.create_dir(self.outputs_operations_path)
-        FileOperations.write_file(self.outputs_operations_path + f"//{file_name}.feature", file_data)
+    def _create_operation_file(self, endpoint, file_name, file_data):
+        endpoint_path = self.outputs_endpoints_path + "//" + endpoint + "//operations"
+        if not DirectoryOperations.check_dir_exists(endpoint_path):
+            DirectoryOperations.create_dir(endpoint_path)
+        FileOperations.write_file(endpoint_path + f"//{file_name}.feature", file_data)
 
-    def _create_model_file(self, directory_name, file_name, file_data):
-        directory_name = self.outputs_models_path + '//' + directory_name
-        if not DirectoryOperations.check_dir_exists(directory_name):
-            DirectoryOperations.create_dir(directory_name)
-        YAMLFileOperations.write_file(directory_name + f"//{file_name}.yml", file_data)
+    def _create_model_file(self, endpoint, file_name, file_data):
+        endpoint_path = self.outputs_endpoints_path + "//" + endpoint + "//models"
+        if not DirectoryOperations.check_dir_exists(endpoint_path):
+            DirectoryOperations.create_dir(endpoint_path)
+        YAMLFileOperations.write_file(endpoint_path + f"//{file_name}.yml", file_data)
 
     def run(self):
         # Read JSON file - API contract information:
@@ -99,7 +96,7 @@ class KarateOperationsAutomation:
             self.karate_ops_obj.run(data)
 
             # Save file:
-            self._create_operation_file(endpoint, self.karate_ops_obj.karate_operations_feature)
+            self._create_operation_file(endpoint, endpoint, self.karate_ops_obj.karate_operations_feature)
 
 
 if __name__ == "__main__":
