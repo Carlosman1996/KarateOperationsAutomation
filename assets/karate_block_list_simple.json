@@ -17,7 +17,7 @@
     },
     {
       "comment": "Validate exact response schema",
-      "operation": "* def responseValidator = req.responseEqualsMatches? req.responseEqualsMatches : []"
+      "operation": "* def responseValidator = req.responseEqualsMatches? req.responseEqualsMatches : response"
     },
     {
       "comment": "",

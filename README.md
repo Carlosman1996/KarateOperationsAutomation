@@ -7,3 +7,6 @@
 - Controller level - create feature files that connect test level with operations
 - Database level - business logic tests must implement database PRE- and POST-conditions
 - Refactor, unit testing, integration testing, E2E testing
+
+- Generate test-cases (name: "test-" + operation name OR endpoint method and api call)
+- Add form data input: files

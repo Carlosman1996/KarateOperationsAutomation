@@ -174,6 +174,8 @@ class ContractProcessor:
                 request_dict[param_name] = "string"
             elif param_type == "boolean":
                 request_dict[param_name] = True
+            elif param_type == "array":
+                request_dict[param_name] = []
             else:
                 # TODO: raise NotImplementedError
                 request_dict[param_name] = None
@@ -192,6 +194,8 @@ class ContractProcessor:
                 elif parameter["in"] == "path":
                     request["path"] = _set_parameter(request["path"], parameter["name"], parameter["type"])
                 elif parameter["in"] == "formData":
+                    request["params"] = _set_parameter(request["params"], parameter["name"], parameter["type"])
+                elif parameter["in"] == "query":
                     request["params"] = _set_parameter(request["params"], parameter["name"], parameter["type"])
                 elif parameter["in"] == "body":
                     request["body"] = self._search_endpoint_response_schema(parameter)

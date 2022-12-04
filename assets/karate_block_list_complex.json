@@ -17,7 +17,7 @@
     },
     {
       "comment": "Validate exact <key_description> schema",
-      "operation": "* def response<key_validation>Validator = req.response<key_validation>ExactMatches? req.response<key_validation>ExactMatches : []"
+      "operation": "* def response<key_validation>Validator = req.response<key_validation>ExactMatches? req.response<key_validation>ExactMatches : response<key_validation>"
     },
     {
       "comment": "",
